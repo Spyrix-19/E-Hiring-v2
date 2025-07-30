@@ -15,7 +15,8 @@ var apiService = builder.AddProject<Projects.BFPR4B_EHiring_ApiService>("ApiServ
 var vueApp = builder.AddNpmApp("Web", "../BFPR4B.EHiring.Web", "dev")
                      .WithReference(apiService)
                      .WaitFor(apiService)
-                     .WithHttpEndpoint(env: "DEV_SERVER_PORT")
+                     .WithHttpsEndpoint(env: "DEV_SERVER_PORT")
+                     .WithHttpEndpoint()
                      .WithExternalHttpEndpoints();
 
 //builder.AddExecutable("browser-launcher", "powershell", $"-Command \"Start-Process '{vueApp.GetAddress()}'\"")

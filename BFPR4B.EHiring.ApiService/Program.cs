@@ -117,7 +117,7 @@ builder.Services.AddCors(options =>
     // Renamed policy to avoid confusion, you had "AllowMultipleOrigins" later but defined "AllowSpecificOrigin"
     options.AddPolicy("AllowAllLocalhostOrigins", builder =>
     {
-        builder.WithOrigins("https://localhost:7121", "https://localhost:7148") // Add your API's origin too
+        builder.WithOrigins("http://localhost:5227", "https://localhost:7222", "https://localhost:56539") // Add your API's origin too
            .AllowAnyHeader()
            .AllowAnyMethod()
            .AllowCredentials();  // Allow credentials for cookies or authentication headers
@@ -125,6 +125,8 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+app.UseCors("AllowAllLocalhostOrigins");
 
 app.MapDefaultEndpoints();
 
@@ -145,7 +147,6 @@ if (app.Environment.IsDevelopment())
     app.UseReDoc(options =>
     {
         options.SpecUrl("/openapi/v1.json");
-        options.SpecUrl("/openapi/v2.json");
     });
 
     app.MapScalarApiReference();

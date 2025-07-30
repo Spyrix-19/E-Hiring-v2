@@ -58,6 +58,7 @@ export default defineConfig({
         },
         port: parseInt(env.DEV_SERVER_PORT || '56539'),
         strictPort: true, // Optional: ensures Vite only uses this port
+        host: true, // Add this line
         https: {
             key: fs.readFileSync(keyFilePath),
             cert: fs.readFileSync(certFilePath),
