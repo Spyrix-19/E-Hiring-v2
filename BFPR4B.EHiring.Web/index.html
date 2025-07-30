@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BFP MIMAROPA E-Hiring</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <script>
+        // Function to set the theme based on preference
+        function setTheme(theme) {
+            if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark'); // Store preference
+            } else {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light'); // Store preference
+            }
+        }
+
+        // Check for saved theme preference or system preference on initial load
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            setTheme(savedTheme);
+        } else {
+            // If no saved theme, default to system preference
+            setTheme('system');
+        }
+
+        // Listen for system theme changes (e.g., user changes OS theme)
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) { // Only react if user hasn't set a manual preference
+                setTheme('system');
+            }
+        });
+    </script>
+
+    <style>
+        /* Apply Inter font family (make sure to import it or use a fallback) */
+        /* You might want to link Inter font from Google Fonts here for better performance */
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Add base background and text color that adapts to dark/light */
+            @apply bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100;
+        }
+        /* Custom styles for rounded buttons */
+        .\!rounded-button {
+            border-radius: 0.5rem;
+        }
+        /* Hide spin buttons for number inputs */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        /* General transition classes */
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+        }
+
+        .duration-500 {
+            transition-duration: 500ms;
+        }
+        /* Mobile sidebar specific styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 16rem; /* Tailwind's w-64 is 16rem */
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                z-index: 50;
+                transition: transform 0.3s ease-in-out;
+            }
+
+            .sidebar-mobile-closed {
+                transform: translateX(-100%);
+            }
+
+            .sidebar-mobile-open {
+                transform: translateX(0);
+            }
+            /* Main content adjustment for mobile when sidebar is open */
+            .main-content-mobile-transform {
+                transform: translateX(16rem); /* Shift content by sidebar width */
+                transition: transform 0.3s ease-in-out;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
