@@ -3,9 +3,14 @@ using BFPR4B.EHiring.ApiService.Models.Data;
 using BFPR4B.EHiring.ApiService.Repository.IRepository;
 using BFPR4B.EHiring.ApiService.Repository.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
 using System.Text;
 
@@ -13,36 +18,33 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
-// Add services to the container.
-
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 
-// Add API Versioning
 builder.Services.AddApiVersioning(options =>
 {
-    options.ReportApiVersions = true; // Reports API versions in response headers
-    options.AssumeDefaultVersionWhenUnspecified = true; // If a client doesn't specify a version, assume the default
-    options.DefaultApiVersion = new ApiVersion(1, 0); // Set default API version to 1.0
-    options.ApiVersionReader = new UrlSegmentApiVersionReader(); // Read API version from URL segment (e.g., /v1/controller)
+    options.ReportApiVersions = true; 
+    options.AssumeDefaultVersionWhenUnspecified = true; 
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.ApiVersionReader = new UrlSegmentApiVersionReader(); 
 })
-.AddMvc() // IMPORTANT: Chain .AddMvc() if you are using Controllers
-// CRITICAL FIX: Uncomment and configure AddApiExplorer for API Versioning
-// This registers services that allow Swagger to discover and group API versions.
+.AddMvc() 
 .AddApiExplorer(options =>
 {
-    // GroupNameFormat: Defines the format of the API version in Swagger UI dropdowns.
-    // "'v'VVV" means "v1", "v2", etc.
     options.GroupNameFormat = "'v'VVV";
-    // SubstituteApiVersionInUrl: Tells Swagger to replace the version placeholder in URLs.
-    // E.g., /api/v{version}/MyController becomes /api/v1/MyController
     options.SubstituteApiVersionInUrl = true;
 });
 
+builder.Services.AddOpenApi("v1", options =>
+{
+    options.ShouldInclude = (apiDescription) => apiDescription.GetApiVersion().MajorVersion == 1;
+});
 
-builder.Services.AddOpenApi();
-
+builder.Services.AddOpenApi("v2", options =>
+{
+    options.ShouldInclude = (apiDescription) => apiDescription.GetApiVersion().MajorVersion == 2;
+});
 
 builder.Services.AddDbContext<ApplicationDbContext>(option =>
 {
@@ -56,7 +58,6 @@ builder.Services.AddScoped<IFrameworkRepository, FrameworkRepository>();
 builder.Services.AddScoped<IRecruitmentRepository, RecruitmentRepository>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-
 
 builder.Services.AddDataProtection(); // Add this line
 
@@ -96,8 +97,6 @@ builder.Services.AddAuthentication(x =>
         Encoding.UTF8.GetBytes(builder.Configuration["APISettings:SecretKey"]))
     };
 
-    // Handling token expiration event
-
     options.Events = new JwtBearerEvents
     {
         OnAuthenticationFailed = context =>
@@ -114,13 +113,12 @@ builder.Services.AddAuthentication(x =>
 
 builder.Services.AddCors(options =>
 {
-    // Renamed policy to avoid confusion, you had "AllowMultipleOrigins" later but defined "AllowSpecificOrigin"
     options.AddPolicy("AllowAllLocalhostOrigins", builder =>
     {
         builder.WithOrigins("http://localhost:5227", "https://localhost:7222", "https://localhost:56539") // Add your API's origin too
            .AllowAnyHeader()
            .AllowAnyMethod()
-           .AllowCredentials();  // Allow credentials for cookies or authentication headers
+           .AllowCredentials();  
     });
 });
 
@@ -147,9 +145,17 @@ if (app.Environment.IsDevelopment())
     app.UseReDoc(options =>
     {
         options.SpecUrl("/openapi/v1.json");
+        options.RoutePrefix = "redoc/v1";
+    });
+
+    app.UseReDoc(options =>
+    {
+        options.SpecUrl("/openapi/v2.json");
+        options.RoutePrefix = "redoc/v2";
     });
 
     app.MapScalarApiReference();
+
 }
 
 app.UseHttpsRedirection();
@@ -159,5 +165,24 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapFallbackToFile("/index.html");
+
+//var apiDescriptionProvider = app.Services.GetService<IApiDescriptionGroupCollectionProvider>();
+//if (apiDescriptionProvider != null)
+//{
+//    Console.WriteLine("\n--- Discovered API Description Groups (via IApiDescriptionGroupCollectionProvider) ---");
+//    foreach (var group in apiDescriptionProvider.ApiDescriptionGroups.Items)
+//    {
+//        Console.WriteLine($"Group Name: {group.GroupName ?? "No Name"}");
+//        foreach (Microsoft.AspNetCore.Mvc.ApiExplorer.ApiDescription apiDescription in group.Items) // <-- Explicitly qualify type here
+//        {
+//            Console.WriteLine($"  Path: {apiDescription.RelativePath}, Method: {apiDescription.HttpMethod}");
+//            foreach (var version in apiDescription.ApiVersions)
+//            {
+//                Console.WriteLine($"    API Version: {version}");
+//            }
+//        }
+//    }
+//    Console.WriteLine("-----------------------------------------------------------------------------------\n");
+//}
 
 app.Run();

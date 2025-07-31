@@ -5,8 +5,9 @@ namespace BFPR4B.EHiring.ApiService.Repository.IRepository
 {
     public interface IAuthRepository
     {
-        //Task<ApiResponse> SendOTPAsync(LoginRequestDTO parameters);
-        //Task<ApiResponse> LoginAsync(LoginRequestDTO parameters);
-        //Task<ApiResponse> RegisterAsync(RegistrationRequestDTO parameters);
+        Task<ApiResponse> LoginOTPAsync(LoginRequestDTO parameters);
+        Task<ApiResponse> LoginAsync(LoginRequestDTO parameters);
+        Task<ApiResponse> LoginV2Async(LoginRequestDTO parameters);
+        Task<ApiResponse> RegisterAsync(RegistrationRequestDTO parameters);
     }
 }

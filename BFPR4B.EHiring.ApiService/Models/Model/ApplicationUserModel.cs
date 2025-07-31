@@ -1,7 +1,10 @@
-﻿namespace BFPR4B.EHiring.ApiService.Models.Model
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BFPR4B.EHiring.ApiService.Models.Model
 {
     public class ApplicationUserModel
     {
+        [Key]
         public int Userno { get; set; } = 0;
         public string Lastname { get; set; } = "";
         public string Firstname { get; set; } = "";

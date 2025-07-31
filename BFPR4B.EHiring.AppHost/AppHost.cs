@@ -1,15 +1,16 @@
 using Aspire.Hosting;
-using BFPR4B.EHiring.AppHost;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
 var cache = builder.AddRedis("cache");
 
 var apiService = builder.AddProject<Projects.BFPR4B_EHiring_ApiService>("ApiService")
-    //.WithExternalHttpEndpoints()
+    .WithExternalHttpEndpoints()
     .WithSwaggerUI()
-    .WithScalar()
-    .WithReDoc();
+    .WithScalar("v1")
+    .WithScalar("v2")
+    .WithReDoc("v1")
+    .WithReDoc("v2");
 
 
 var vueApp = builder.AddNpmApp("Web", "../BFPR4B.EHiring.Web", "dev")
