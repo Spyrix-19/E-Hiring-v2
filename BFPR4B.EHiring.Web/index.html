@@ -93,6 +93,40 @@
                 transition: transform 0.3s ease-in-out;
             }
         }
+
+        /* --- Autofill Styles Start --- */
+        /* Define CSS variables for easier management and dark mode toggling */
+        :root {
+            --input-autofill-background-light: #ffffff; /* White for light mode */
+            --input-autofill-text-color-light: #1f2937; /* gray-800 for light mode, slightly darker than 900 for contrast */
+
+            --input-autofill-background-dark: #374151; /* gray-700 for dark mode */
+            --input-autofill-text-color-dark: #f3f4f6; /* gray-100 for dark mode */
+        }
+
+        /* Apply autofill styles for Webkit browsers */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            /* Use box-shadow to override background color, important for autofill */
+            -webkit-box-shadow: 0 0 0px 1000px var(--input-autofill-background-light) inset !important;
+            /* Set text color */
+            -webkit-text-fill-color: var(--input-autofill-text-color-light) !important;
+            /* Add a long transition to prevent color flashes */
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        /* Apply dark mode autofill styles when the 'dark' class is present on html */
+        html.dark input:-webkit-autofill,
+        html.dark input:-webkit-autofill:hover,
+        html.dark input:-webkit-autofill:focus,
+        html.dark input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0px 1000px var(--input-autofill-background-dark) inset !important;
+            -webkit-text-fill-color: var(--input-autofill-text-color-dark) !important;
+        }
+        /* --- Autofill Styles End --- */
+
     </style>
 </head>
 <body>
